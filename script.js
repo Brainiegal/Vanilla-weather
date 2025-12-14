@@ -17,12 +17,10 @@ function getWeatherIcon(iconCode) {
     "snow-day": "❄️",
     "snow-night": "❄️",
     "mist-day": "🌫️",
-    "mist-night": "🌫️",
+    "mist-night": "🌫️"
   };
-
   return iconMap[iconCode] || "🌤️";
 }
-
 
 function formatTime(date) {
   let hours = date.getHours();
@@ -34,20 +32,14 @@ function formatTime(date) {
     "Wednesday",
     "Thursday",
     "Friday",
-    "Saturday",
+    "Saturday"
   ];
 
-  if (hours < 10) {
-    hours = `0${hours}`;
-  }
-  if (minutes < 10) {
-    minutes = `0${minutes}`;
-  }
+  if (hours < 10) hours = `0${hours}`;
+  if (minutes < 10) minutes = `0${minutes}`;
 
-  let dayName = days[date.getDay()];
-  return `${dayName} ${hours}:${minutes}`;
+  return `${days[date.getDay()]} ${hours}:${minutes}`;
 }
-
 
 function displayWeather(response) {
   let temperatureElement = document.querySelector("#temperature");
@@ -72,58 +64,33 @@ function displayWeather(response) {
   windSpeedElement.innerHTML = `${windSpeed} km/h`;
   timeElement.innerHTML = formatTime(new Date());
   iconElement.innerHTML = icon;
-
-  cityElement.classList.remove("loading");
 }
-
 
 function searchCity(city) {
   let apiKey = "c8348o5b825a070bd50b2ac18daatf0b";
   
   let apiUrl = `https://api.shecodes.io/weather/v1/current?query=${city}&key=${apiKey}&units=metric`;
 
-  axios.get(apiUrl).then(displayWeather).catch(handleError);
-}
-
-function handleError(error) {
-  let cityElement = document.querySelector("#city");
-  let descriptionElement = document.querySelector("#description");
-
-  cityElement.innerHTML = "City not found";
-  descriptionElement.innerHTML = "Please try another city";
-  
-  console.error("Error fetching weather data:", error);
+  axios
+    .get(apiUrl)
+    .then(displayWeather)
+    .catch((error) => {
+      alert("City not found. Please try another city.");
+      console.error("Error:", error);
+    });
 }
 
 function handleSearchSubmit(event) {
   event.preventDefault();
-  
+
   let searchInput = document.querySelector("#search-form-input");
   let city = searchInput.value.trim();
 
   if (city) {
-    document.querySelector("#city").classList.add("loading");
-    
     searchCity(city);
   }
 }
+let searchFormElement = document.querySelector("#search-form");
+searchFormElement.addEventListener("submit", handleSearchSubmit);
 
-
-function initializeApp() {
-  let searchFormElement = document.querySelector("#search-form");
-  searchFormElement.addEventListener("submit", handleSearchSubmit);
-
-  searchCity("Paris");
-}
-
-initializeApp();
-
-document.querySelector("#search-form-input").addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    handleSearchSubmit(event);
-  }
-});
-
-document.querySelector("#search-form-input").addEventListener("focus", function() {
-  this.select();
-});
+searchCity("Paris");
